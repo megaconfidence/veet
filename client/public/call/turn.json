@@ -1,0 +1,22 @@
+{
+	"iceServers": [
+		{
+			"urls": "stun:stun.cloudflare.com:3478"
+		},
+		{
+			"urls": "turn:turn.cloudflare.com:3478",
+			"username": "1845e12bdf0147670e4c38fc5b212ebd069495de67a5df1a15fc5bc15d1b8b79c6b0bad603ce84240271900ae3f6992d",
+			"credential": "98d5a479196509fd34c45c00dfa33eda36f0557e6f35d1700dc87a276bcd82b1587f359c720fc91d3075169c27d4cf9b"
+		},
+		{
+			"urls": "turns:turn.cloudflare.com:5349?transport=tcp",
+			"username": "1845e12bdf0147670e4c38fc5b212ebd069495de67a5df1a15fc5bc15d1b8b79c6b0bad603ce84240271900ae3f6992d",
+			"credential": "98d5a479196509fd34c45c00dfa33eda36f0557e6f35d1700dc87a276bcd82b1587f359c720fc91d3075169c27d4cf9b"
+		},
+		{
+			"urls": "turn:turn.cloudflare.com:3478?transport=tcp",
+			"username": "1845e12bdf0147670e4c38fc5b212ebd069495de67a5df1a15fc5bc15d1b8b79c6b0bad603ce84240271900ae3f6992d",
+			"credential": "98d5a479196509fd34c45c00dfa33eda36f0557e6f35d1700dc87a276bcd82b1587f359c720fc91d3075169c27d4cf9b"
+		}
+	]
+}

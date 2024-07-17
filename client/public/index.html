@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Veet</title>
+		<link href="style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="logo"><img src="images/veet.png" /> <span>Veet</span></div>
+		<h1>Free video calls for everyone</h1>
+		<p>From anywhere, connect, collaborate, and celebrate with Veet</p>
+		<div id="lobby">
+			<form id="new">
+				<button>
+					<img src="images/video_add.svg" />
+					<span>New Meeting</span>
+				</button>
+			</form>
+			<form id="join">
+				<input type="url" name="url" placeholder="Meeting Link" value="" />
+				<button>Join</button>
+			</form>
+		</div>
+	</body>
+	<script>
+		const joinForm = document.getElementById('join');
+		const newFrom = document.getElementById('new');
+
+		function startCall(id) {
+			window.location.href = `/call?i=${id}`;
+		}
+
+		newFrom.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			startCall(crypto.randomUUID());
+		});
+
+		joinForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const data = Object.fromEntries(new FormData(e.target));
+			const url = new URL(data.url);
+			const id = url.searchParams.get('i');
+			if (!id) return;
+			startCall(id);
+		});
+	</script>
+</html>

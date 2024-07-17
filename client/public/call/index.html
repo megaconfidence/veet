@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Veet</title>
+		<link href="style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="call">
+			<div id="videos">
+				<video class="video-player hide" id="remote-video" autoplay playsinline></video>
+				<video class="video-player" id="local-video" autoplay playsinline muted></video>
+			</div>
+			<div id="controls">
+				<div id="audio-ctl">
+					<img src="../images/audio.svg" />
+				</div>
+				<div id="video-ctl">
+					<img src="../images/video.svg" />
+				</div>
+				<div id="endcall">
+					<img src="../images/call_end.svg" />
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="module" src="index.js"></script>
+</html>
