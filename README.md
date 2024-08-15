@@ -7,7 +7,7 @@ A video call app built with [Cloudflare Pages](https://developers.cloudflare.com
 ![Architecture](./images/arch.jpg)
 Peer to peer connection for video and audio stream is delivered over [WebRTC](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API). Peer discovery and signalling is powered by [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) over [Durable Objects](https://developers.cloudflare.com/durable-objects/api/websockets/).
 
-The diagram below explains how signalling over WebSocket happens on the frontend:
+The diagram below explains how signalling over WebSocket happens on the frontend
 ![Signalling](./images/timing.png)
 
 # Local Setup
@@ -27,4 +27,8 @@ cd server
 npm i
 npm start #available on ws://localhost:8787
 ```
-Once deployed, update `env.ws` in [`client/public/call/index.js`](https://github.com/megaconfidence/veet/blob/bb50f00158571b8ab2fa755f8e33476941ee393d/client/public/call/index.js#L12)
+To deploy either the client or server, run the following the corresponding directory
+```sh
+npm run deploy
+```
+Once the server is deployed deployed, update `env.ws` in [`client/public/call/index.js`](https://github.com/megaconfidence/veet/blob/bb50f00158571b8ab2fa755f8e33476941ee393d/client/public/call/index.js#L12) to the deployed server address.
