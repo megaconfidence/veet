@@ -2,6 +2,10 @@
 
 A video call app built with [Cloudflare Pages](https://developers.cloudflare.com/pages/) and [Durable Objects](https://developers.cloudflare.com/durable-objects/).
 
+## Video tutorials 
+
+- [Build a Video Call App with Durable Objects](https://www.youtube.com/playlist?list=PLzfTyn6__SjgC2ty1_BAl0RGgr2jKjngz)
+
 ## How It Works
 
 ![Architecture](./images/arch.jpg)
@@ -32,3 +36,4 @@ To deploy either the client or server, run the following the corresponding direc
 npm run deploy
 ```
 Once the server is deployed deployed, update `env.ws` in [`client/public/call/index.js`](https://github.com/megaconfidence/veet/blob/bb50f00158571b8ab2fa755f8e33476941ee393d/client/public/call/index.js#L12) to the deployed server address.
+
