@@ -35,5 +35,5 @@ To deploy either the client or server, run the following the corresponding direc
 ```sh
 npm run deploy
 ```
-Once the server is deployed deployed, update `env.ws` in [`client/public/call/index.js`](https://github.com/megaconfidence/veet/blob/bb50f00158571b8ab2fa755f8e33476941ee393d/client/public/call/index.js#L12) to the deployed server address.
+Once the server is deployed, update `env.ws` in [`client/public/call/index.js`](https://github.com/megaconfidence/veet/blob/bb50f00158571b8ab2fa755f8e33476941ee393d/client/public/call/index.js#L12) to the deployed server address.
 
