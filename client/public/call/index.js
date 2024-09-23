@@ -9,7 +9,7 @@ if (location.hostname == 'localhost') {
 	env.ws = 'ws://localhost:8787';
 	env.servers = { iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }] };
 } else {
-	env.ws = 'wss://veet-server.walshy-work.workers.dev';
+	env.ws = 'wss://veet-server.employee-account.workers.dev';
 	env.servers = await fetch('./turn.json').then((r) => r.json());
 }
 
