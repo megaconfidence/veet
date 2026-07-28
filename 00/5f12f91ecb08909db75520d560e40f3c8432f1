@@ -1,0 +1,31 @@
+README.md
+  s_50ada7357c59b5::t_c8bdadd1c73459 5-9,15-17,19,23-83,85-114,116-125,157-158,160-161
+public/shared/devices.js
+  s_223f6c0043d558::t_c04961258ea537 1-84
+public/shared/profile.js
+  s_223f6c0043d558::t_17ba39af682f2a 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "005f12f91ecb08909db75520d560e40f3c8432f1",
+  "prompts": {},
+  "sessions": {
+    "s_223f6c0043d558": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_05799fd46ffepOMLXqZbLrbGZG",
+        "model": "claude-opus-5"
+      },
+      "human_author": "megaconfidence <cokoghenun@gmail.com>"
+    },
+    "s_50ada7357c59b5": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0578f26f5ffeercSkcew6404BS",
+        "model": "claude-opus-5"
+      },
+      "human_author": "megaconfidence <cokoghenun@gmail.com>"
+    }
+  }
+}
