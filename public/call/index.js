@@ -4,14 +4,13 @@ const videoBtn = document.getElementById('video-ctl');
 const endCallBtn = document.getElementById('endcall');
 const audioBtn = document.getElementById('audio-ctl');
 
-const env = {};
-if (location.hostname == 'localhost') {
-	env.ws = 'ws://localhost:8787';
-	env.servers = { iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }] };
-} else {
-	env.ws = 'wss://veet-server.conflare.workers.dev';
-	env.servers = await fetch('./turn.json').then((r) => r.json());
-}
+// Signalling runs on the same Worker that served this page, so the origin is
+// whatever we were loaded from — no environment switching needed.
+const wsUrl = (id) => `${location.protocol == 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/${id}`;
+
+// Resolved before signalling starts, so peer connections can be built
+// synchronously. The Worker mints short-lived TURN credentials.
+let iceConfig;
 
 let ws;
 let localStream;
@@ -47,7 +46,8 @@ const wssend = (data) => ws.send(JSON.stringify(data));
 (async function () {
 	const id = new URLSearchParams(location.search).get('i');
 	if (!id) return;
-	ws = new WebSocket(`${env.ws}/${id}`);
+	iceConfig = await fetch('/ice').then((r) => r.json());
+	ws = new WebSocket(wsUrl(id));
 	ws.onmessage = handleMessages;
 	ws.onopen = () => wssend({ type: 'joined' });
 	await startLocalPlayback();
@@ -60,7 +60,7 @@ async function startLocalPlayback() {
 }
 
 async function connectToPeer() {
-	peerConnection = new RTCPeerConnection(env.servers);
+	peerConnection = new RTCPeerConnection(iceConfig);
 	remoteStream = new MediaStream();
 
 	localVid.classList.add('video-player-secondary');

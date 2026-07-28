@@ -1,13 +1,13 @@
 {
-	"name": "veet-server",
+	"name": "veet",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
-		"start": "wrangler dev"
+		"start": "wrangler dev",
+		"deploy": "wrangler deploy"
 	},
 	"devDependencies": {
-		"wrangler": "^3.0.0"
+		"wrangler": "^4.114.0"
 	}
 }

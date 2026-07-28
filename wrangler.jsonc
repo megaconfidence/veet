@@ -1,0 +1,32 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "veet",
+	"main": "./src/index.js",
+	"compatibility_date": "2026-07-28",
+	"observability": {
+		"enabled": true,
+	},
+	// The frontend is served directly from this Worker. Static assets are matched
+	// first, except for the signalling/ICE paths which must always hit the script.
+	"assets": {
+		"directory": "./public",
+		"binding": "ASSETS",
+		"run_worker_first": ["/ws/*", "/ice"],
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "VEET",
+				"class_name": "Veet",
+			},
+		],
+	},
+	// Declarative replacement for the legacy `migrations` array. New namespaces
+	// must use the SQLite backend; key-value backed classes can no longer be created.
+	"exports": {
+		"Veet": {
+			"type": "durable-object",
+			"storage": "sqlite",
+		},
+	},
+}
