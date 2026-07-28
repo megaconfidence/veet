@@ -96,6 +96,20 @@ The Durable Object relays whatever it is given and only inspects `to`, so `media
 connection is up. Candidates that arrive before the remote description is set are queued
 and flushed, which is routine with trickled ICE.
 
+## Chat
+
+Messages travel over a [WebRTC data
+channel](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel), not the
+signalling socket, so chat is as peer-to-peer as the video and never reaches Cloudflare.
+Nothing is stored on either end: reload the page and the conversation is gone.
+
+Adding a data channel to a live connection would normally force a renegotiation. It does
+not here, because of the same rule that avoids glare — only the newcomer dials. The
+newcomer calls `createDataChannel()` **before** `createOffer()`, so the `m=application`
+section is in the very first offer and the answering peer picks it up through
+`ondatachannel`. Each pair of participants ends up with exactly one offer and one answer,
+data channel included.
+
 ## Names and devices
 
 A shared settings dialog ([`public/shared/`](./public/shared)) is reachable from the
@@ -118,7 +132,7 @@ src/index.js       Worker entry: the signalling Durable Object, /ice, and the as
 public/
   index.html       Lobby — create or join a meeting
   style.css
-  call/            The call page: tile grid, controls, mesh client
+  call/            The call page: tile grid, controls, mesh client, chat panel
   shared/          Settings dialog, device enumeration, stored preferences
   images/
 wrangler.jsonc     Assets, Durable Object binding, and its SQLite-backed export

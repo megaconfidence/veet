@@ -47,13 +47,41 @@ body {
 	border: 0;
 }
 
+/* Three rows, two columns. The second column is the chat panel, collapsed to
+   zero until `body.chat-open`, so opening it squeezes the stage rather than
+   covering it. */
 .app {
 	display: grid;
 	height: 100dvh;
 	grid-template-rows: auto minmax(0, 1fr) auto;
+	grid-template-columns: minmax(0, 1fr) 0px;
 	padding: var(--pad);
 	padding-bottom: max(var(--pad), env(safe-area-inset-bottom));
 	gap: var(--gap);
+	/* No gutter while the panel is collapsed, or it leaves a dead strip. */
+	column-gap: 0;
+	transition:
+		grid-template-columns 0.28s var(--ease),
+		column-gap 0.28s var(--ease);
+}
+
+body.chat-open .app {
+	grid-template-columns: minmax(0, 1fr) min(340px, 38vw);
+	column-gap: var(--gap);
+}
+
+.topbar,
+.controls {
+	grid-column: 1 / -1;
+}
+
+.stage {
+	grid-column: 1;
+}
+
+.chat {
+	grid-column: 2;
+	grid-row: 2;
 }
 
 /* ------------------------------------------------------------- top bar -- */
@@ -342,6 +370,241 @@ body {
 	scale: 0.96;
 }
 
+/* ---------------------------------------------------------------- chat -- */
+
+.chat {
+	display: grid;
+	grid-template-rows: auto auto minmax(0, 1fr) auto;
+	overflow: hidden;
+	min-width: 0;
+	border-radius: var(--radius-tile);
+	background-color: var(--surface);
+	/* Collapsed: hidden from the tab order and from assistive tech. */
+	visibility: hidden;
+	opacity: 0;
+	transition:
+		opacity 0.2s var(--ease),
+		visibility 0.28s;
+}
+
+body.chat-open .chat {
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0.06s;
+}
+
+.chat-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 14px 8px 0 16px;
+}
+
+.chat-title {
+	margin: 0;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.chat-close {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	flex: none;
+	padding: 0;
+	color: var(--muted);
+	cursor: pointer;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+	transition-property: background-color, color;
+	transition-duration: 0.16s;
+}
+
+.chat-close::before {
+	content: '';
+	width: 18px;
+	height: 18px;
+	background-color: currentColor;
+	-webkit-mask: var(--x) center / 18px 18px no-repeat;
+	mask: var(--x) center / 18px 18px no-repeat;
+	--x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z'/%3E%3C/svg%3E");
+}
+
+.chat-close:hover {
+	color: var(--text);
+	background-color: var(--surface-hi);
+}
+
+.chat-note {
+	margin: 2px 16px 10px;
+	font-size: 0.75rem;
+	line-height: 1.4;
+	color: var(--muted);
+	text-wrap: pretty;
+}
+
+.chat-log {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	overflow-y: auto;
+	padding: 4px 16px 12px;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+	scrollbar-color: var(--surface-hover) transparent;
+}
+
+.chat-log:focus-visible {
+	outline: 2px solid var(--accent-hi);
+	outline-offset: -2px;
+}
+
+.chat-empty {
+	margin: auto 0;
+	font-size: 0.8125rem;
+	color: var(--muted);
+	text-align: center;
+}
+
+.chat-who {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 12px 0 3px;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--text);
+}
+
+/* Sit the conversation on the bottom of the panel. `justify-content: flex-end`
+   would do it too, but then overflowing content cannot be scrolled back to. */
+.chat-log > :first-child {
+	margin-top: auto;
+}
+
+.chat-who time {
+	font-size: 0.6875rem;
+	font-weight: 400;
+	color: var(--muted);
+}
+
+.chat-line {
+	margin: 0;
+	padding: 7px 11px;
+	max-width: 100%;
+	width: fit-content;
+	font-size: 0.875rem;
+	line-height: 1.45;
+	/* Peer text is arbitrary: never let a long token blow out the column. */
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+	border-radius: 4px 12px 12px 12px;
+	background-color: var(--surface-hi);
+	animation: chat-in 0.2s var(--ease) both;
+}
+
+.chat-line + .chat-line {
+	margin-top: 3px;
+	border-top-left-radius: 12px;
+}
+
+.chat-line.mine {
+	margin-left: auto;
+	color: #fff;
+	border-radius: 12px 4px 12px 12px;
+	background-color: var(--accent);
+}
+
+.chat-line.mine + .chat-line.mine {
+	border-top-right-radius: 12px;
+}
+
+.chat-system {
+	margin: 10px 0 2px;
+	font-size: 0.75rem;
+	color: var(--muted);
+	text-align: center;
+}
+
+.chat-form {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	padding: 10px 12px 12px;
+	border-top: 1px solid var(--surface-hi);
+}
+
+.chat-input {
+	flex: 1;
+	min-width: 0;
+	max-height: 120px;
+	padding: 10px 12px;
+	font: inherit;
+	font-size: 0.875rem;
+	line-height: 1.4;
+	color: var(--text);
+	resize: none;
+	border: 1px solid transparent;
+	border-radius: 18px;
+	background-color: var(--surface-hi);
+	transition-property: border-color, background-color;
+	transition-duration: 0.16s;
+}
+
+.chat-input::placeholder {
+	color: var(--muted);
+}
+
+.chat-input:focus {
+	outline: none;
+	border-color: var(--accent-hi);
+	background-color: var(--bg);
+}
+
+.chat-send {
+	display: grid;
+	place-items: center;
+	width: 40px;
+	height: 40px;
+	flex: none;
+	padding: 0;
+	color: var(--muted);
+	cursor: pointer;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+	transition-property: background-color, color, scale;
+	transition-duration: 0.16s;
+}
+
+.chat-send .icon {
+	--icon: url('../images/send.svg');
+	width: 20px;
+	height: 20px;
+	-webkit-mask-size: 20px 20px;
+	mask-size: 20px 20px;
+}
+
+.chat-send:hover {
+	color: var(--text);
+	background-color: var(--surface-hi);
+}
+
+.chat-send:active {
+	scale: 0.94;
+}
+
+@keyframes chat-in {
+	from {
+		opacity: 0;
+		translate: 0 4px;
+	}
+}
+
 /* ------------------------------------------------------------ controls -- */
 
 .controls {
@@ -433,6 +696,33 @@ body {
 
 #settings-ctl .icon {
 	--icon: url('../images/settings.svg');
+}
+
+#chat-ctl .icon {
+	--icon: url('../images/chat.svg');
+}
+
+.ctl-badge {
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	display: grid;
+	place-items: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	font-size: 0.6875rem;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+	color: #fff;
+	border-radius: 999px;
+	background-color: var(--danger);
+	box-shadow: 0 0 0 2px var(--bg);
+}
+
+/* An explicit display would otherwise beat the [hidden] UA rule. */
+.ctl-badge[hidden] {
+	display: none;
 }
 
 .ctl-end .icon {
@@ -536,6 +826,31 @@ body {
 	/* Touch devices have no hover, so tooltips only ever get in the way. */
 	.tip {
 		display: none;
+	}
+
+	/* Too narrow to squeeze a column beside the video, so the panel covers it. */
+	body.chat-open .app {
+		grid-template-columns: minmax(0, 1fr) 0px;
+		column-gap: 0;
+	}
+
+	.chat {
+		position: fixed;
+		z-index: 30;
+		top: var(--pad);
+		right: var(--pad);
+		bottom: max(var(--pad), env(safe-area-inset-bottom));
+		left: var(--pad);
+		translate: 0 10px;
+		box-shadow: 0 16px 48px rgb(0 0 0 / 0.5);
+		transition:
+			opacity 0.2s var(--ease),
+			translate 0.24s var(--ease),
+			visibility 0.28s;
+	}
+
+	body.chat-open .chat {
+		translate: 0;
 	}
 }
 

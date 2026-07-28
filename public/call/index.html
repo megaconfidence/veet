@@ -33,6 +33,30 @@
 				</section>
 			</main>
 
+			<aside class="chat" id="chat" aria-label="In-call messages">
+				<header class="chat-head">
+					<h2 class="chat-title">In-call messages</h2>
+					<button class="chat-close" id="chat-close" type="button" aria-label="Close chat"></button>
+				</header>
+				<p class="chat-note">Messages are sent peer-to-peer and disappear when you leave.</p>
+				<div class="chat-log" id="chat-log" role="log" aria-live="polite" tabindex="0">
+					<p class="chat-empty" id="chat-empty">No messages yet.</p>
+				</div>
+				<form class="chat-form" id="chat-form">
+					<textarea
+						class="chat-input"
+						id="chat-input"
+						rows="1"
+						placeholder="Send a message"
+						aria-label="Message"
+						autocomplete="off"
+					></textarea>
+					<button class="chat-send" type="submit" aria-label="Send message">
+						<span class="icon" aria-hidden="true"></span>
+					</button>
+				</form>
+			</aside>
+
 			<footer class="controls">
 				<button class="ctl" id="audio-ctl" type="button" aria-pressed="false">
 					<span class="icon" aria-hidden="true"></span>
@@ -48,6 +72,12 @@
 					<span class="icon" aria-hidden="true"></span>
 					<span class="sr-only">Copy meeting link</span>
 					<span class="tip" aria-hidden="true">Copy link</span>
+				</button>
+				<button class="ctl" id="chat-ctl" type="button" aria-expanded="false" aria-controls="chat">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="ctl-badge" id="chat-unread" hidden></span>
+					<span class="sr-only">Toggle chat</span>
+					<span class="tip" aria-hidden="true">Chat</span>
 				</button>
 				<button class="ctl" id="settings-ctl" type="button">
 					<span class="icon" aria-hidden="true"></span>

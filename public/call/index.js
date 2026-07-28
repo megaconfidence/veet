@@ -1,6 +1,7 @@
 import { loadPrefs, openStream, openTrack, routeOutput, savePrefs, videoQuality } from '../shared/devices.js';
 import { cleanName, loadName } from '../shared/profile.js';
 import { createSettings } from '../shared/settings.js';
+import { CHAT_MAX, createChat } from './chat.js';
 
 const stage = document.getElementById('stage');
 const tileTpl = document.getElementById('tile-template');
@@ -31,6 +32,9 @@ const peers = new Map();
 
 const signal = (data) => ws?.readyState == WebSocket.OPEN && ws.send(JSON.stringify(data));
 
+// Built up front so an early data channel always has somewhere to render.
+const chat = createChat({ onSend: sendChat });
+
 /* ---------------------------------------------------------------- tiles -- */
 
 function addTile(id, { self = false } = {}) {
@@ -49,11 +53,14 @@ const tileOf = (id) => stage.querySelector(`.tile[data-peer="${CSS.escape(id)}"]
 
 // Peers who never introduce themselves keep the "Guest n" they were assigned.
 function setTileName(id, name) {
+	const chosen = cleanName(name); //never trust a name off the wire
+	const entry = peers.get(id);
+	if (entry) entry.name = chosen; //chat labels read this too
+
 	const tile = tileOf(id);
 	if (!tile) return;
 
-	const chosen = cleanName(name); //never trust a name off the wire
-	const label = id == 'self' ? (chosen ? `${chosen} (You)` : 'You') : chosen || peers.get(id)?.fallback || 'Guest';
+	const label = id == 'self' ? (chosen ? `${chosen} (You)` : 'You') : chosen || entry?.fallback || 'Guest';
 
 	tile.querySelector('.tile-name').textContent = label;
 	tile.querySelector('.tile-initial').textContent = label.slice(0, 1).toUpperCase();
@@ -109,8 +116,11 @@ function getPeer(id) {
 	const pc = new RTCPeerConnection(iceConfig);
 	const remoteStream = new MediaStream();
 	guestCount += 1;
-	const entry = { pc, remoteStream, pending: [], fallback: `Guest ${guestCount}` };
+	const entry = { pc, remoteStream, pending: [], fallback: `Guest ${guestCount}`, name: '', chat: null };
 	peers.set(id, entry);
+
+	// The dialer opens the chat channel; we are the answering side here.
+	pc.ondatachannel = (e) => bindChat(id, e.channel);
 
 	const tile = addTile(id);
 	setTileName(id, '');
@@ -137,9 +147,11 @@ function getPeer(id) {
 function dropPeer(id) {
 	const entry = peers.get(id);
 	if (!entry) return;
+	entry.chat?.close();
 	entry.pc.close();
 	peers.delete(id);
 	removeTile(id);
+	chat.append({ text: `${entry.name || entry.fallback} left the call`, system: true });
 	describeRoom();
 }
 
@@ -147,6 +159,11 @@ function dropPeer(id) {
 // so two participants can never offer to each other at the same time.
 async function dial(id) {
 	const { pc } = getPeer(id);
+
+	// Created *before* the offer so the data channel rides along in the first
+	// SDP. Adding one later would force a renegotiation.
+	bindChat(id, pc.createDataChannel('chat', { ordered: true }));
+
 	const offer = await pc.createOffer();
 	await pc.setLocalDescription(offer);
 	signal({ type: 'offer', to: id, offer });
@@ -247,6 +264,48 @@ function announceName(to) {
 function introduce(to) {
 	announceMedia(to);
 	announceName(to);
+}
+
+/* ------------------------------------------------------------------ chat -- */
+
+// Chat rides a WebRTC data channel, not the signalling socket, so messages go
+// straight to the other browsers and never reach Cloudflare. Nothing is stored:
+// leave the call and the history is gone.
+function bindChat(id, channel) {
+	const entry = peers.get(id);
+	if (!entry) return;
+	entry.chat = channel;
+
+	channel.onmessage = (e) => {
+		let text;
+		try {
+			text = JSON.parse(e.data).text;
+		} catch {
+			return; //not ours
+		}
+		if (typeof text != 'string' || !text.trim()) return;
+		chat.append({ name: entry.name || entry.fallback, text: text.slice(0, CHAT_MAX) });
+	};
+}
+
+function sendChat(text) {
+	if (!peers.size) return toast('No one else is here yet');
+
+	const payload = JSON.stringify({ text });
+	let delivered = 0;
+	for (const { chat: channel } of peers.values()) {
+		if (channel?.readyState != 'open') continue;
+		try {
+			channel.send(payload);
+			delivered += 1;
+		} catch {
+			//channel died between the check and the send
+		}
+	}
+
+	chat.append({ name: 'You', text, mine: true });
+	if (!delivered) toast('Still connecting — message not delivered');
+	else if (delivered < peers.size) toast(`Delivered to ${delivered} of ${peers.size}`);
 }
 
 /* ----------------------------------------------------------------- boot -- */
@@ -376,7 +435,10 @@ async function copyLink() {
 }
 
 function leave() {
-	peers.forEach((entry) => entry.pc.close());
+	peers.forEach((entry) => {
+		entry.chat?.close();
+		entry.pc.close();
+	});
 	peers.clear();
 	localStream?.getTracks().forEach((t) => t.stop());
 	ws?.close();
