@@ -2,47 +2,109 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Veet</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#ffffff" />
+		<meta name="description" content="Free peer-to-peer video calls. No sign-up, no downloads." />
+		<title>Veet — Free video calls for everyone</title>
+		<link href="images/favicon.ico" rel="icon" />
+		<link href="shared/settings.css" rel="stylesheet" />
 		<link href="style.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="logo"><img src="images/veet.png" /> <span>Veet</span></div>
-		<h1>Free video calls for everyone</h1>
-		<p>From anywhere, connect, collaborate, and celebrate with Veet</p>
-		<div id="lobby">
-			<form id="new">
-				<button>
-					<img src="images/video_add.svg" />
-					<span>New Meeting</span>
-				</button>
-			</form>
-			<form id="join">
-				<input type="url" name="url" placeholder="Meeting Link" value="" />
-				<button>Join</button>
-			</form>
-		</div>
+		<header class="topbar">
+			<a class="brand" href="/">
+				<img src="images/veet.png" alt="" width="26" height="26" />
+				<span>Veet</span>
+			</a>
+		</header>
+
+		<main class="hero">
+			<h1>Free video calls for everyone</h1>
+			<p class="lede">From anywhere, connect, collaborate, and celebrate with Veet.</p>
+
+			<div class="actions">
+				<form id="new">
+					<button class="btn btn-primary" type="submit">
+						<span class="icon icon-add" aria-hidden="true"></span>
+						<span>New meeting</span>
+					</button>
+				</form>
+
+				<form id="join" novalidate>
+					<div class="field">
+						<span class="icon icon-link" aria-hidden="true"></span>
+						<input
+							id="meeting"
+							name="url"
+							type="text"
+							placeholder="Enter a meeting link"
+							autocomplete="off"
+							spellcheck="false"
+							aria-label="Meeting link"
+						/>
+					</div>
+					<button class="btn btn-ghost" type="submit">Join</button>
+				</form>
+			</div>
+
+			<p class="hint" id="hint" role="status" aria-live="polite"></p>
+
+			<button class="linkish" id="check-devices" type="button">
+				<span class="icon icon-settings" aria-hidden="true"></span>
+				<span>Set your name, camera, and mic</span>
+			</button>
+
+			<p class="note">Calls are peer-to-peer. Your video never touches a server.</p>
+		</main>
+
+		<script type="module">
+			import { createSettings } from '/shared/settings.js';
+
+			const joinForm = document.getElementById('join');
+			const newForm = document.getElementById('new');
+			const field = document.getElementById('meeting');
+			const hint = document.getElementById('hint');
+
+			const startCall = (id) => (window.location.href = `/call?i=${encodeURIComponent(id)}`);
+
+			// Accept a full meeting link or a bare id pasted on its own.
+			function parseMeeting(value) {
+				const raw = value.trim();
+				if (!raw) return null;
+				try {
+					return new URL(raw).searchParams.get('i');
+				} catch {
+					return /^[\w-]+$/.test(raw) ? raw : null;
+				}
+			}
+
+			function reject(message) {
+				hint.textContent = message;
+				field.setAttribute('aria-invalid', 'true');
+				field.focus();
+			}
+
+			newForm.addEventListener('submit', (e) => {
+				e.preventDefault();
+				startCall(crypto.randomUUID());
+			});
+
+			joinForm.addEventListener('submit', (e) => {
+				e.preventDefault();
+				const id = parseMeeting(field.value);
+				if (!id) return reject('That does not look like a Veet link. Paste the whole link you were sent.');
+				startCall(id);
+			});
+
+			field.addEventListener('input', () => {
+				hint.textContent = '';
+				field.removeAttribute('aria-invalid');
+			});
+
+			// No call to patch here, so the dialog runs its own preview stream and
+			// just remembers the picks for whenever a call does start.
+			const settings = createSettings();
+			document.getElementById('check-devices').addEventListener('click', () => settings.open());
+		</script>
 	</body>
-	<script>
-		const joinForm = document.getElementById('join');
-		const newFrom = document.getElementById('new');
-
-		function startCall(id) {
-			window.location.href = `/call?i=${id}`;
-		}
-
-		newFrom.addEventListener('submit', async (e) => {
-			e.preventDefault();
-			startCall(crypto.randomUUID());
-		});
-
-		joinForm.addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const data = Object.fromEntries(new FormData(e.target));
-			const url = new URL(data.url);
-			const id = url.searchParams.get('i');
-			if (!id) return;
-			startCall(id);
-		});
-	</script>
 </html>

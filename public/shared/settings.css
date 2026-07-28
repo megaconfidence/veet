@@ -1,0 +1,279 @@
+/* Device settings dialog. Dark by default; the lobby overrides the tokens. */
+
+.sx {
+	--sx-panel: #26282d;
+	--sx-inset: #1a1c20;
+	--sx-text: #e8eaed;
+	--sx-muted: #9aa0a6;
+	--sx-line: #3c4043;
+	--sx-line-hi: #5f6368;
+	--sx-accent: #4285f4;
+	--sx-danger: #f0574a;
+	--sx-radius: 24px;
+	--sx-pad: 16px;
+	--sx-inner: 8px;
+	--sx-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960' fill='%239aa0a6'%3E%3Cpath d='M480-360 280-560h400L480-360Z'/%3E%3C/svg%3E");
+
+	width: min(440px, calc(100vw - 32px));
+	/* Landscape phones are shorter than the panel, so let it scroll. */
+	max-height: calc(100dvh - 32px);
+	overflow: auto;
+	padding: 0;
+	color: var(--sx-text);
+	border: none;
+	border-radius: var(--sx-radius);
+	background-color: var(--sx-panel);
+	box-shadow:
+		0 0 0 1px rgb(255 255 255 / 0.06),
+		0 24px 64px rgb(0 0 0 / 0.5);
+	font-family: inherit;
+}
+
+.sx::backdrop {
+	background-color: rgb(0 0 0 / 0.55);
+	backdrop-filter: blur(3px);
+}
+
+.sx[open] {
+	animation: sx-in 0.24s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sx[open]::backdrop {
+	animation: sx-fade 0.24s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sx-panel {
+	display: grid;
+	gap: 12px;
+	padding: var(--sx-pad);
+}
+
+.sx-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.sx-title {
+	margin: 0;
+	font-size: 1.0625rem;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+
+.sx-close {
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	margin-right: -6px;
+	padding: 0;
+	color: var(--sx-muted);
+	cursor: pointer;
+	border: none;
+	border-radius: 50%;
+	background-color: transparent;
+	transition-property: background-color, color, scale;
+	transition-duration: 0.16s;
+}
+
+.sx-close::before {
+	content: '';
+	width: 18px;
+	height: 18px;
+	background-color: currentColor;
+	-webkit-mask: var(--sx-x) center / 18px 18px no-repeat;
+	mask: var(--sx-x) center / 18px 18px no-repeat;
+	--sx-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z'/%3E%3C/svg%3E");
+}
+
+.sx-close:hover {
+	color: var(--sx-text);
+	background-color: var(--sx-inset);
+}
+
+.sx-close:active {
+	scale: 0.96;
+}
+
+/* ------------------------------------------------------------- preview -- */
+
+.sx-preview {
+	position: relative;
+	overflow: hidden;
+	aspect-ratio: 16 / 9;
+	border-radius: var(--sx-inner);
+	background-color: #000;
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+.sx-video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transform: scaleX(-1); /* mirrored, matching the self view in a call */
+}
+
+.sx-meter {
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	bottom: 10px;
+	height: 4px;
+	overflow: hidden;
+	border-radius: 999px;
+	background-color: rgb(255 255 255 / 0.22);
+}
+
+.sx-meter-fill {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit;
+	background-color: #34a853;
+	transform: scaleX(0);
+	transform-origin: left center;
+	will-change: transform;
+}
+
+/* -------------------------------------------------------------- fields -- */
+
+.sx-field {
+	display: grid;
+	gap: 6px;
+}
+
+.sx-field[hidden] {
+	display: none;
+}
+
+.sx-label {
+	font-size: 0.8125rem;
+	color: var(--sx-muted);
+}
+
+/* Scoped one level deeper than the host page's element selectors, so a global
+   `input[type='text']` rule cannot restyle the controls in here. */
+.sx .sx-input,
+.sx .sx-select {
+	width: 100%;
+	height: 42px;
+	margin: 0;
+	padding: 0 36px 0 12px;
+	font: inherit;
+	font-size: 0.875rem;
+	color: var(--sx-text);
+	cursor: pointer;
+	border: 1px solid var(--sx-line);
+	border-radius: var(--sx-inner);
+	background-color: var(--sx-inset);
+	appearance: none;
+	background-image: var(--sx-caret);
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	background-size: 18px 18px;
+	box-shadow: none;
+	transition-property: border-color, box-shadow;
+	transition-duration: 0.16s;
+}
+
+.sx .sx-input {
+	padding-right: 12px;
+	cursor: text;
+	background-image: none;
+}
+
+.sx .sx-input::placeholder {
+	color: var(--sx-muted);
+	opacity: 1;
+}
+
+.sx .sx-input:hover,
+.sx .sx-select:hover:not(:disabled) {
+	border-color: var(--sx-line-hi);
+}
+
+.sx .sx-input:focus,
+.sx .sx-input:focus-visible,
+.sx .sx-select:focus,
+.sx .sx-select:focus-visible {
+	outline: none;
+	border-color: var(--sx-accent);
+	box-shadow: 0 0 0 3px rgb(66 133 244 / 0.25);
+}
+
+.sx .sx-select:disabled {
+	color: var(--sx-muted);
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+.sx-error,
+.sx-note {
+	margin: 0;
+	font-size: 0.8125rem;
+	text-wrap: pretty;
+}
+
+.sx-error {
+	color: var(--sx-danger);
+}
+
+.sx-error[hidden],
+.sx-note[hidden] {
+	display: none;
+}
+
+.sx-note {
+	color: var(--sx-muted);
+}
+
+/* ---------------------------------------------------------- responsive -- */
+
+@media (max-width: 520px) {
+	/* Bottom sheet: `auto` top margin with a zero bottom margin pins it down. */
+	.sx {
+		width: 100vw;
+		max-width: 100vw;
+		max-height: 92dvh;
+		margin: auto 0 0;
+		border-radius: var(--sx-radius) var(--sx-radius) 0 0;
+	}
+
+	.sx-panel {
+		padding-bottom: max(var(--sx-pad), env(safe-area-inset-bottom));
+	}
+
+	.sx[open] {
+		animation: sx-sheet 0.26s cubic-bezier(0.2, 0, 0, 1);
+	}
+}
+
+@keyframes sx-in {
+	from {
+		opacity: 0;
+		scale: 0.96;
+		translate: 0 8px;
+	}
+}
+
+@keyframes sx-sheet {
+	from {
+		translate: 0 100%;
+	}
+}
+
+@keyframes sx-fade {
+	from {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sx[open],
+	.sx[open]::backdrop {
+		animation-duration: 0.01ms;
+	}
+}

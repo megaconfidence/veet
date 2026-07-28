@@ -2,28 +2,79 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#131417" />
 		<title>Veet</title>
+		<link href="../images/favicon.ico" rel="icon" />
+		<link href="../shared/settings.css" rel="stylesheet" />
 		<link href="style.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div class="call">
-			<div id="videos">
-				<video class="video-player hide" id="remote-video" autoplay playsinline></video>
-				<video class="video-player" id="local-video" autoplay playsinline muted></video>
-			</div>
-			<div id="controls">
-				<div id="audio-ctl">
-					<img src="../images/audio.svg" />
-				</div>
-				<div id="video-ctl">
-					<img src="../images/video.svg" />
-				</div>
-				<div id="endcall">
-					<img src="../images/call_end.svg" />
-				</div>
-			</div>
+		<div class="app">
+			<header class="topbar">
+				<a class="brand" href="/">
+					<img src="../images/veet.png" alt="" width="22" height="22" />
+					<span>Veet</span>
+				</a>
+				<p class="status" id="status" data-state="connecting">
+					<span class="status-dot" aria-hidden="true"></span>
+					<span id="status-text">Connecting</span>
+				</p>
+			</header>
+
+			<main class="stage" id="stage" data-count="1" data-layout="solo">
+				<section class="invite" id="invite">
+					<h1 class="invite-title">Ready when you are</h1>
+					<p class="invite-sub">Share this link to bring someone into the call.</p>
+					<button class="invite-copy" id="copy-link" type="button">
+						<span class="icon" aria-hidden="true"></span>
+						<span id="copy-label">Copy meeting link</span>
+					</button>
+				</section>
+			</main>
+
+			<footer class="controls">
+				<button class="ctl" id="audio-ctl" type="button" aria-pressed="false">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="sr-only">Mute microphone</span>
+					<span class="tip" aria-hidden="true">Mute</span>
+				</button>
+				<button class="ctl" id="video-ctl" type="button" aria-pressed="false">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="sr-only">Turn off camera</span>
+					<span class="tip" aria-hidden="true">Camera off</span>
+				</button>
+				<button class="ctl ctl-link" id="share-ctl" type="button">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="sr-only">Copy meeting link</span>
+					<span class="tip" aria-hidden="true">Copy link</span>
+				</button>
+				<button class="ctl" id="settings-ctl" type="button">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="sr-only">Open settings</span>
+					<span class="tip" aria-hidden="true">Settings</span>
+				</button>
+				<button class="ctl ctl-end" id="endcall" type="button">
+					<span class="icon" aria-hidden="true"></span>
+					<span class="sr-only">Leave call</span>
+					<span class="tip" aria-hidden="true">Leave</span>
+				</button>
+			</footer>
 		</div>
+
+		<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+		<template id="tile-template">
+			<div class="tile">
+				<video class="tile-video" autoplay playsinline></video>
+				<div class="tile-placeholder"><span class="tile-initial"></span></div>
+				<div class="tile-meta">
+					<span class="tile-badge" data-muted hidden><span class="icon" aria-hidden="true"></span></span>
+					<span class="tile-name"></span>
+				</div>
+			</div>
+		</template>
+
+		<script type="module" src="index.js"></script>
 	</body>
-	<script type="module" src="index.js"></script>
 </html>

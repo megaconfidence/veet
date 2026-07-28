@@ -1,0 +1,5 @@
+# Both are optional. Without them Veet falls back to STUN only, which works on most
+# home networks but cannot connect peers behind symmetric NAT or strict firewalls.
+# Create a key at https://dash.cloudflare.com/?to=/:account/calls
+TURN_KEY_ID=
+TURN_KEY_API_TOKEN=
