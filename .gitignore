@@ -95,12 +95,11 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
+# Wrangler reads local secrets from .env. The committed template is the one
+# exception, and it must be un-ignored explicitly because of the glob above it.
 
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 
@@ -169,6 +168,8 @@ dist
 .pnp.\*
 
 # wrangler project
+# .dev.vars is no longer used, but stays ignored: if one is left lying around
+# Wrangler loads it *instead of* .env, silently.
 
-.dev.vars
+.dev.vars*
 .wrangler/

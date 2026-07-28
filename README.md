@@ -168,12 +168,20 @@ npx wrangler secret put TURN_KEY_ID
 npx wrangler secret put TURN_KEY_API_TOKEN
 ```
 
-For local development, copy [`.dev.vars.example`](./.dev.vars.example) to `.dev.vars`
-(already gitignored) and fill in the same values
+For local development, copy [`.env.example`](./.env.example) to `.env` (already
+gitignored) and fill in the same values
 
 ```sh
-cp .dev.vars.example .dev.vars
+cp .env.example .env
 ```
+
+Secrets set with `wrangler secret put` live on Cloudflare, per Worker and per account.
+`.env` is only ever read by `wrangler dev` — it is never uploaded — so a fresh account
+needs its own `secret put` runs.
+
+> If a `.dev.vars` file exists it wins and `.env` is ignored, with no warning about the
+> conflict. Your only tell is the `Using secrets defined in …` line that `wrangler dev`
+> prints on startup — check it names `.env`, and delete any leftover `.dev.vars`.
 
 The long-term key stays on the server. `/ice` exchanges it for credentials that expire
 after two hours.
